@@ -21,7 +21,7 @@ app.use((req, res, next) => {
   });
 
 app.use("/uploads", express.static("uploads"));
-const port = 8000
+const port = process.env.PORT || 8000;
 
 app.use("/user", user);
 app.use("/application", application);
