@@ -4,9 +4,7 @@ const md5 = require("md5");
 const multer = require("../multer");
 const jwt = require("jsonwebtoken");
 const uniqid = require("uniqid")
-const users = [];
-
-
+let users = [];
 
 router.post("/create", (req, res) => {
 
@@ -23,18 +21,20 @@ router.post("/create", (req, res) => {
     res.status(403).json({ status: 403, message: "username or email already exists" })
   } else {
     const userId = uniqid();
-
     const createUser = {
       userId,
       username,
       email,
       password,
+      date : new Date(),
+      isAdmin: false,
+      isSuperAdmin: false
     }
 
-    
     const copyUser = { ...createUser }
     delete copyUser.password
     console.log({ copyUser })
+
     jwt.sign(
       { user: copyUser },
       `secretkey`,
@@ -68,7 +68,7 @@ router.post("/login", (req, res) => {
   if (isUserFound) {
     const copyUser = { ...isUserFound }
     delete copyUser.password
-    
+
     jwt.sign(
       { user: copyUser },
       `secretkey`,
@@ -83,6 +83,29 @@ router.post("/login", (req, res) => {
       })
   } else {
     res.status(404).json({ message: "Invalid username or password" })
+  }
+})
+
+
+router.put("/status", (req, res) => {
+  const id = req.body.userId;
+  try {
+    if(id && users){
+      users = users.map((user) => {
+        if (user.userId === id) {
+          const activeUser = { ...user, isAdmin: !user.isAdmin }
+          res.contentType("application/json")
+          res.status(200).json(activeUser)
+          return activeUser
+        }
+        return user;
+      })
+    }else{
+      res.status(400).json({message : "something went wrong"})
+    }
+  }
+  catch (e) {
+    res.status(400).json({ status: 400, message: e })
   }
 })
 

@@ -1,5 +1,6 @@
 const express = require('express')
 const user = require("./routes/user")
+const application = require("./routes/application")
 const app = express()
 
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use("/uploads", express.static("uploads"));
 const port = 8000
 
 app.use("/user", user);
+app.use("/application", application);
 
 app.get("/", (req, res) => {
     res.send("hello world")
